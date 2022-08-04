@@ -43,12 +43,13 @@ class VendorData:
         }
 
 
-class Validator:
-    _raw_dump = []
+class DataSource:
+    def __init__(self):
+        self._raw_dump = []
 
-    def validator_advisory(self, purl) -> Iterable[VendorData]:
+    def datasource_advisory(self, purl) -> Iterable[VendorData]:
         """
-        Yield VendorData object corresponding to vendor
+        Yield VendorData object corresponding to DataSource
         """
         return NotImplementedError
 
@@ -57,7 +58,7 @@ class Validator:
         """
         Return dictionary containing supported ecosystem
         {
-           "PURL equivalent ecosystem" : "Validator ecosystem",
+           "PURL equivalent ecosystem" : "DataSource ecosystem",
         }
         """
         return NotImplementedError
