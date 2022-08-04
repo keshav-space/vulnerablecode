@@ -64,7 +64,7 @@ class DepsDataSource(DataSource):
         return {
             "npm": "npm",
             "maven": "maven",
-            "go": "go",
+            "golang": "go",
             "pypi": "pypi",
             "cargo": "cargo",
             # Coming soon
@@ -109,7 +109,7 @@ def generate_meta_payload(purl):
                 return
             purl_name = quote(f"{purl.namespace}:{purl.name}", safe="")
 
-        elif purl.type == "go":
+        elif purl.type == "golang":
             if purl.namespace:
                 purl_name = quote(f"{purl.namespace}/{purl.name}", safe="")
             if not purl_version.startswith("v"):
