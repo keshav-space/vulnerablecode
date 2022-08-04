@@ -60,7 +60,7 @@ class OSVDataSource(DataSource):
         return {
         "npm": "npm", 
         "maven": "Maven", 
-        "go": "Go", 
+        "golang": "Go", 
         "nuget": "NuGet", 
         "pypi": "PyPI", 
         "rubygems": "RubyGems", 
@@ -160,7 +160,7 @@ def generate_payload(purl):
             return
         payload["package"]["name"] = nuget_package
 
-    elif purl.type == 'go' and purl.namespace:
+    elif purl.type == 'golang' and purl.namespace:
             payload["package"]["name"] = f"{purl.namespace}/{purl.name}"
 
     else:
