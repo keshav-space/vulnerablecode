@@ -64,7 +64,7 @@ class GithubDataSource(DataSource):
             "composer": "COMPOSER",
             "pypi": "PIP",
             "gem": "RUBYGEMS",
-            "go": "GO",
+            "golang": "GO",
             "rust": "RUST",
             "npm": "NPM",
             "erlang": "ERLANG",
@@ -152,7 +152,7 @@ def generate_graphql_payload(purl, end_cursor):
             return
         package_name = f"{purl.namespace}/{purl.name}"
 
-    elif purl.type == "go" and purl.namespace:
+    elif purl.type == "golang" and purl.namespace:
         package_name = f"{purl.namespace}/{purl.name}"
 
     return {"query": GRAPHQL_QUERY_TEMPLATE % (ecosystem, package_name, end_cursor_exp)}

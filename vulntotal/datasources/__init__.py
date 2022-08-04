@@ -24,7 +24,6 @@
 
 from vulntotal.datasources import github
 
-
 DATASOURCE_REGISTRY = [
     github.GithubDataSource,
 ]
