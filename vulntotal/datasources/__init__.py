@@ -24,9 +24,11 @@
 
 
 from vulntotal.datasources import osv
+from vulntotal.datasources import github
 
 DATASOURCE_REGISTRY = [
     osv.OSVDataSource,
+    github.GithubDataSource,
 ]
 
 
