@@ -22,6 +22,7 @@
 #  Visit https://github.com/nexB/vulnerablecode/ for support and download.
 
 from vulntotal.datasources import github
+from vulntotal.datasources import gitlab
 from vulntotal.datasources import oss
 from vulntotal.datasources import osv
 from vulntotal.datasources import snyk
@@ -33,6 +34,7 @@ DATASOURCE_REGISTRY = [
     oss.OSSDataSource,
     vulnerablecode.VulnerableCodeDataSource,
     snyk.SnykDataSource,
+    gitlab.GitlabDataSource,
 ]
 
 DATASOURCE_REGISTRY = {x.__module__.split(".")[-1]: x for x in DATASOURCE_REGISTRY}

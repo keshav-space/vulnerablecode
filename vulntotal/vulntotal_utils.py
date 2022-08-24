@@ -109,3 +109,26 @@ def snky_constraints_satisfied(snyk_constrain, version):
         if not compare(GenericVersion(version), snyk_comparator, GenericVersion(snyk_version)):
             return False
     return True
+
+
+def gitlab_constraints_satisfied(gitlab_constrain, version):
+    gitlab_constraints = gitlab_constrain.strip()
+    constraints = gitlab_constraints.split("||")
+
+    for constraint in constraints:
+        is_constraint_satisfied = True
+
+        for subcontraint in constraint.strip().split(" "):
+
+            gitlab_comparator, gitlab_version = parse_constraint(subcontraint.strip())
+            if not gitlab_version:
+                continue
+            # TODO: Replace the GenericVersion with ecosystem specific from univers
+            if not compare(
+                GenericVersion(version), gitlab_comparator, GenericVersion(gitlab_version)
+            ):
+                is_constraint_satisfied = False
+                break
+
+        if is_constraint_satisfied:
+            return True
