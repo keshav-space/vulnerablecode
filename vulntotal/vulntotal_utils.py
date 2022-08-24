@@ -74,18 +74,41 @@ def compare(version, package_comparator, package_version):
     return compare(version, package_version)
 
 
-def parse_gitlab_constraint(constraint):
+def parse_constraint(constraint):
     if constraint.startswith(("<=", ">=", "==", "!=")):
         return constraint[:2], constraint[2:]
 
     if constraint.startswith(("<", ">", "=", "[", "]", "(", ")")):
         return constraint[0], constraint[1:]
 
-
-"""
     if constraint.endswith(("[", "]", "(", ")")):
         return constraint[-1], constraint[:-1]
-"""
+
+
+def github_constraints_satisfied(github_constrain, version):
+    gh_constraints = github_constrain.strip().replace(" ", "")
+    constraints = gh_constraints.split(",")
+    for constraint in constraints:
+        gh_comparator, gh_version = parse_constraint(constraint)
+        if not gh_version:
+            continue
+        # TODO: Replace the GenericVersion with ecosystem specific from univers
+        if not compare(GenericVersion(version), gh_comparator, GenericVersion(gh_version)):
+            return False
+    return True
+
+
+def snky_constraints_satisfied(snyk_constrain, version):
+    snyk_constraints = snyk_constrain.strip().replace(" ", "")
+    constraints = snyk_constraints.split(",")
+    for constraint in constraints:
+        snyk_comparator, snyk_version = parse_constraint(constraint)
+        if not snyk_version:
+            continue
+        # TODO: Replace the GenericVersion with ecosystem specific from univers or maybe not if snyk is normalizing versions to semver
+        if not compare(GenericVersion(version), snyk_comparator, GenericVersion(snyk_version)):
+            return False
+    return True
 
 
 def gitlab_constraints_satisfied(gitlab_constrain, version):
@@ -97,7 +120,7 @@ def gitlab_constraints_satisfied(gitlab_constrain, version):
 
         for subcontraint in constraint.strip().split(" "):
 
-            gitlab_comparator, gitlab_version = parse_gitlab_constraint(subcontraint.strip())
+            gitlab_comparator, gitlab_version = parse_constraint(subcontraint.strip())
             if not gitlab_version:
                 continue
             # TODO: Replace the GenericVersion with ecosystem specific from univers
