@@ -26,8 +26,11 @@ import operator
 
 class GenericVersion:
     def __init__(self, version):
-        self.value = version
-        self.decomposed = tuple([int(i) if i.isnumeric() else i for i in version.split(".")])
+        self.value = version.replace(" ", "").lstrip("v")
+
+        self.decomposed = tuple(
+            [int(com) if com.isnumeric() else com for com in self.value.split(".")]
+        )
 
     def __str__(self):
         return str(self.value)
@@ -71,7 +74,7 @@ def compare(version, package_comparator, package_version):
     return compare(version, package_version)
 
 
-def parse_snyk_constraint(constraint):
+def parse_constraint(constraint):
     if constraint.startswith(("<=", ">=", "==", "!=")):
         return constraint[:2], constraint[2:]
 
@@ -82,11 +85,24 @@ def parse_snyk_constraint(constraint):
         return constraint[-1], constraint[:-1]
 
 
+def github_constraints_satisfied(github_constrain, version):
+    gh_constraints = github_constrain.strip().replace(" ", "")
+    constraints = gh_constraints.split(",")
+    for constraint in constraints:
+        gh_comparator, gh_version = parse_constraint(constraint)
+        if not gh_version:
+            continue
+        # TODO: Replace the GenericVersion with ecosystem specific from univers
+        if not compare(GenericVersion(version), gh_comparator, GenericVersion(gh_version)):
+            return False
+    return True
+
+
 def snky_constraints_satisfied(snyk_constrain, version):
     snyk_constraints = snyk_constrain.strip().replace(" ", "")
     constraints = snyk_constraints.split(",")
     for constraint in constraints:
-        snyk_comparator, snyk_version = parse_snyk_constraint(constraint)
+        snyk_comparator, snyk_version = parse_constraint(constraint)
         if not snyk_version:
             continue
         # TODO: Replace the GenericVersion with ecosystem specific from univers or maybe not if snyk is normalizing versions to semver
