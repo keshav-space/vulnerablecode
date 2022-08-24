@@ -21,48 +21,31 @@
 #  VulnTotal is a free software tool from nexB Inc. and others.
 #  Visit https://github.com/nexB/vulnerablecode/ for support and download.
 
-import dataclasses
 import json
-from typing import Iterable
-from typing import List
+from pathlib import Path
 
-from vulnerabilities.utils import classproperty
+from commoncode import testcase
+from packageurl import PackageURL
 
-
-@dataclasses.dataclass(order=True)
-class VendorData:
-    aliases: List[str] = dataclasses.field(default_factory=list)
-    affected_versions: List[str] = dataclasses.field(default_factory=list)
-    fixed_versions: List[str] = dataclasses.field(default_factory=list)
-
-    def to_dict(self):
-        return {
-            "affected_versions": self.affected_versions,
-            "fixed_versions": self.fixed_versions,
-            "aliases": self.aliases,
-        }
+from vulnerabilities.tests import util_tests
+from vulntotal.datasources import osv
 
 
-class DataSource:
-    def __init__(self):
-        self._raw_dump = []
+class TestOSV(testcase.FileBasedTesting):
+    test_data_dir = str(Path(__file__).resolve().parent / "test_data" / "osv")
 
-    def datasource_advisory(self, purl) -> Iterable[VendorData]:
-        """
-        Yield VendorData object corresponding to DataSource
-        """
-        return NotImplementedError
+    def test_generate_payload(self):
+        file_purls = self.get_test_loc("purls.txt")
+        with open(file_purls) as f:
+            purls = f.readlines()
+        results = [osv.generate_payload(PackageURL.from_string(purl)) for purl in purls]
+        expected_file = self.get_test_loc("payloads_data-expected.json", must_exist=False)
+        util_tests.check_results_against_json(results, expected_file)
 
-    @classmethod
-    def supported_ecosystem(cls):
-        """
-        Return dictionary containing supported ecosystem
-        {
-           "PURL equivalent ecosystem" : "DataSource ecosystem",
-        }
-        """
-        return NotImplementedError
-
-    @property
-    def raw_dump(self):
-        return self._raw_dump
+    def test_parse_advisory(self):
+        advisory_page = self.get_test_loc("advisory.txt")
+        with open(advisory_page) as f:
+            advisory = json.load(f)
+        results = [adv.to_dict() for adv in osv.parse_advisory(advisory)]
+        expected_file = self.get_test_loc("parse_advisory_data-expected.json", must_exist=False)
+        util_tests.check_results_against_json(results, expected_file)
