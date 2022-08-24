@@ -26,8 +26,11 @@ import operator
 
 class GenericVersion:
     def __init__(self, version):
-        self.value = version
-        self.decomposed = tuple([int(i) for i in version.split(".")])
+        self.value = version.replace(" ", "").lstrip("v")
+
+        self.decomposed = tuple(
+            [int(com) if com.isnumeric() else com for com in self.value.split(".")]
+        )
 
     def __str__(self):
         return str(self.value)
@@ -40,7 +43,12 @@ class GenericVersion:
     def __lt__(self, other):
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return self.decomposed.__lt__(other.decomposed)
+        for i, j in zip(self.decomposed, other.decomposed):
+            if not isinstance(i, type(j)):
+                continue
+            if i.__gt__(j):
+                return False
+        return True
 
     def __le__(self, other):
         if not isinstance(other, self.__class__):
@@ -48,7 +56,7 @@ class GenericVersion:
         return self.__lt__(other) or self.__eq__(other)
 
 
-def compare(version, gh_comparator, gh_version):
+def compare(version, package_comparator, package_version):
     operator_comparator = {
         "<": operator.lt,
         ">": operator.gt,
@@ -57,23 +65,47 @@ def compare(version, gh_comparator, gh_version):
         ">=": operator.ge,
         "==": operator.eq,
         "!=": operator.ne,
+        ")": operator.lt,
+        "]": operator.le,
+        "(": operator.gt,
+        "[": operator.ge,
     }
-    compare = operator_comparator[gh_comparator]
-    return compare(version, gh_version)
+    compare = operator_comparator[package_comparator]
+    return compare(version, package_version)
 
 
-def parse_gh_onstraint(constraint):
+def parse_constraint(constraint):
     if constraint.startswith(("<=", ">=", "==", "!=")):
         return constraint[:2], constraint[2:]
-    elif constraint.startswith(("<", ">", "=")):
+
+    if constraint.startswith(("<", ">", "=", "[", "]", "(", ")")):
         return constraint[0], constraint[1:]
+
+    if constraint.endswith(("[", "]", "(", ")")):
+        return constraint[-1], constraint[:-1]
 
 
 def github_constraints_satisfied(github_constrain, version):
     gh_constraints = github_constrain.strip().replace(" ", "")
     constraints = gh_constraints.split(",")
     for constraint in constraints:
-        gh_comparator, gh_version = parse_gh_onstraint(constraint)
+        gh_comparator, gh_version = parse_constraint(constraint)
+        if not gh_version:
+            continue
+        # TODO: Replace the GenericVersion with ecosystem specific from univers
         if not compare(GenericVersion(version), gh_comparator, GenericVersion(gh_version)):
+            return False
+    return True
+
+
+def snky_constraints_satisfied(snyk_constrain, version):
+    snyk_constraints = snyk_constrain.strip().replace(" ", "")
+    constraints = snyk_constraints.split(",")
+    for constraint in constraints:
+        snyk_comparator, snyk_version = parse_constraint(constraint)
+        if not snyk_version:
+            continue
+        # TODO: Replace the GenericVersion with ecosystem specific from univers or maybe not if snyk is normalizing versions to semver
+        if not compare(GenericVersion(version), snyk_comparator, GenericVersion(snyk_version)):
             return False
     return True

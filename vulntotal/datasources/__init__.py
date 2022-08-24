@@ -24,6 +24,7 @@
 from vulntotal.datasources import github
 from vulntotal.datasources import oss
 from vulntotal.datasources import osv
+from vulntotal.datasources import snyk
 from vulntotal.datasources import vulnerablecode
 
 DATASOURCE_REGISTRY = [
@@ -31,6 +32,7 @@ DATASOURCE_REGISTRY = [
     github.GithubDataSource,
     oss.OSSDataSource,
     vulnerablecode.VulnerableCodeDataSource,
+    snyk.SnykDataSource,
 ]
 
 DATASOURCE_REGISTRY = {x.__module__.split(".")[-1]: x for x in DATASOURCE_REGISTRY}
