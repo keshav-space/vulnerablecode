@@ -54,7 +54,7 @@ class DataSource:
         return NotImplementedError
 
     @classmethod
-    def support_ecosystem(cls):
+    def supported_ecosystem(cls):
         """
         Return dictionary containing supported ecosystem
         {

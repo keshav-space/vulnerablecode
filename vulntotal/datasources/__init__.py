@@ -22,10 +22,12 @@
 #  Visit https://github.com/nexB/vulnerablecode/ for support and download.
 
 
+
 from vulntotal.datasources import osv
 
 DATASOURCE_REGISTRY = [
     osv.OSVDataSource,
 ]
+
 
 DATASOURCE_REGISTRY = {x.__module__.split(".")[-1]: x for x in DATASOURCE_REGISTRY}
