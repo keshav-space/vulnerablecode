@@ -22,6 +22,10 @@ jobs:
           tags: |
             type=sha,event=workflow_dispatch
             type=semver,pattern={{version}}
+          labels: |
+            org.opencontainers.image.title=VulnerableCode
+            org.opencontainers.image.description=A free and open vulnerability database with tools to track, aggregate, and correlate package vulnerabilities
+            org.opencontainers.image.licenses=Apache-2.0
 
       - name: Print extracted metadata
         run: |
