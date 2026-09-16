@@ -8,11 +8,6 @@
 
 FROM python:3.12
 
-LABEL org.opencontainers.image.source="https://github.com/keshav-space/vulnerablecode"
-LABEL org.opencontainers.image.title="VulnerableCode"
-LABEL org.opencontainers.image.description="A free and open vulnerability database with tools to track, aggregate, and correlate package vulnerabilities."
-LABEL org.opencontainers.image.licenses="Apache-2.0"
-
 WORKDIR /app
 
 # Python settings: Force unbuffered stdout and stderr (i.e. they are flushed to terminal immediately)
