@@ -1,0 +1,33 @@
+name: Test Docker Metadata
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "v*.*.*"
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  test-metadata:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@dc802804100637a589fabce1cb79ff13a1411302 # v6.2.0
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=sha,event=workflow_dispatch
+            type=semver,pattern={{version}}
+
+      - name: Print extracted metadata
+        run: |
+          echo "=== TAGS ==="
+          echo "${{ steps.meta.outputs.tags }}"
+          echo "=== LABELS ==="
+          echo "${{ steps.meta.outputs.labels }}"
+          echo "=== ANNOTATIONS ==="
+          echo "${{ steps.meta.outputs.annotations }}"
