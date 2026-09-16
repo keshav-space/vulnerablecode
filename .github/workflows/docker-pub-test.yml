@@ -20,9 +20,13 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: |
-            type=sha,event=workflow_dispatch
+            type=sha,event=workflow_dispatch,enable=${{ !startsWith(github.ref, 'refs/tags/') }}
             type=semver,pattern={{version}}
           labels: |
+            org.opencontainers.image.title=VulnerableCode
+            org.opencontainers.image.description=A free and open vulnerability database with tools to track, aggregate, and correlate package vulnerabilities
+            org.opencontainers.image.licenses=Apache-2.0
+          annotations: |
             org.opencontainers.image.title=VulnerableCode
             org.opencontainers.image.description=A free and open vulnerability database with tools to track, aggregate, and correlate package vulnerabilities
             org.opencontainers.image.licenses=Apache-2.0
